@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "inttypes.h": "c",
+        "sdkconfig.h": "c",
+        "stdlib.h": "c",
+        "dht11.h": "c",
+        "font8x8_basic.h": "c",
+        "moisture.h": "c"
+    },
+    "idf.adapterTargetName": "esp32",
+    "idf.flashType": "UART",
+    "idf.port": "/dev/ttyUSB0"
+}
