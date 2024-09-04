@@ -5,7 +5,9 @@
         "stdlib.h": "c",
         "dht11.h": "c",
         "font8x8_basic.h": "c",
-        "moisture.h": "c"
+        "moisture.h": "c",
+        "nvs.h": "c",
+        "compare": "c"
     },
     "idf.adapterTargetName": "esp32",
     "idf.flashType": "UART",
