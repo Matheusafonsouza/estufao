@@ -17,6 +17,7 @@
 #include "dht11.h"
 #include "nvs.h"
 #include "oled.h"
+#include "button.h"
 
 #define TAG "MAIN"
 
@@ -49,4 +50,5 @@ void app_main(void)
   xTaskCreate(&moisture_task, "sensor_solo", 2048, NULL, 3, NULL);
   xTaskCreate(&save_nvs_task, "armazenamento_nvs", 2048, NULL, 3, NULL);
   xTaskCreate(&oled_display_info_task, "render_display", 2048, NULL, 2, NULL);
+  xTaskCreate(&button_task, "button", 2048, NULL, 2, NULL);
 }
