@@ -19,7 +19,7 @@ typedef union out_column_t {
 
 void ssd1306_init(SSD1306_t * dev, int width, int height)
 {
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		spi_init(dev, width, height);
 	} else {
 		i2c_init(dev, width, height);
@@ -47,7 +47,7 @@ int ssd1306_get_pages(SSD1306_t * dev)
 
 void ssd1306_show_buffer(SSD1306_t * dev)
 {
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		for (int page=0; page<dev->_pages;page++) {
 			spi_display_image(dev, page, 0, dev->_page[page]._segs, dev->_width);
 		}
@@ -78,7 +78,7 @@ void ssd1306_get_buffer(SSD1306_t * dev, uint8_t * buffer)
 
 void ssd1306_display_image(SSD1306_t * dev, int page, int seg, uint8_t * images, int width)
 {
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		spi_display_image(dev, page, seg, images, width);
 	} else {
 		i2c_display_image(dev, page, seg, images, width);
@@ -101,7 +101,7 @@ void ssd1306_display_text(SSD1306_t * dev, int page, char * text, int text_len, 
 		if (dev->_flip) ssd1306_flip(image, 8);
 		ssd1306_display_image(dev, page, seg, image, 8);
 #if 0
-		if (dev->_address == SPIAddress) {
+		if (dev->_address == SPI_ADDRESS) {
 			spi_display_image(dev, page, seg, image, 8);
 		} else {
 			i2c_display_image(dev, page, seg, image, 8);
@@ -154,7 +154,7 @@ ssd1306_display_text_x3(SSD1306_t * dev, int page, char * text, int text_len, bo
 			}
 			if (invert) ssd1306_invert(image, 24);
 			if (dev->_flip) ssd1306_flip(image, 24);
-			if (dev->_address == SPIAddress) {
+			if (dev->_address == SPI_ADDRESS) {
 				spi_display_image(dev, page+yy, seg, image, 24);
 			} else {
 				i2c_display_image(dev, page+yy, seg, image, 24);
@@ -183,7 +183,7 @@ void ssd1306_clear_line(SSD1306_t * dev, int page, bool invert)
 
 void ssd1306_contrast(SSD1306_t * dev, int contrast)
 {
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		spi_contrast(dev, contrast);
 	} else {
 		i2c_contrast(dev, contrast);
@@ -213,7 +213,7 @@ void ssd1306_scroll_text(SSD1306_t * dev, char * text, int text_len, bool invert
 	if (dev->_scEnable == false) return;
 
 	void (*func)(SSD1306_t * dev, int page, int seg, uint8_t * images, int width);
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		func = spi_display_image;
 	} else {
 		func = i2c_display_image;
@@ -255,7 +255,7 @@ void ssd1306_scroll_clear(SSD1306_t * dev)
 
 void ssd1306_hardware_scroll(SSD1306_t * dev, ssd1306_scroll_type_t scroll)
 {
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		spi_hardware_scroll(dev, scroll);
 	} else {
 		i2c_hardware_scroll(dev, scroll);
@@ -399,7 +399,7 @@ void ssd1306_wrap_arround(SSD1306_t * dev, ssd1306_scroll_type_t scroll, int sta
 
 	if (delay >= 0) {
 		for (int page=0;page<dev->_pages;page++) {
-			if (dev->_address == SPIAddress) {
+			if (dev->_address == SPI_ADDRESS) {
 				spi_display_image(dev, page, 0, dev->_page[page]._segs, 128);
 			} else {
 				i2c_display_image(dev, page, 0, dev->_page[page]._segs, 128);
@@ -528,6 +528,34 @@ void _ssd1306_line(SSD1306_t * dev, int x1, int y1, int x2, int y2,  bool invert
 	}
 }
 
+// Draw circle
+void _ssd1306_circle(SSD1306_t * dev, int x0, int y0, int r, bool invert)
+{
+	int x;
+	int y;
+	int err;
+	int old_err;
+
+	x=0;
+	y=-r;
+	err=2-2*r;
+	do{
+		_ssd1306_pixel(dev, x0-x, y0+y, invert); 
+		_ssd1306_pixel(dev, x0-y, y0-x, invert); 
+		_ssd1306_pixel(dev, x0+x, y0-y, invert); 
+		_ssd1306_pixel(dev, x0+y, y0+x, invert); 
+		if ((old_err=err)<=x)	err+=++x*2+1;
+		if (old_err>y || err>x) err+=++y*2+1;	 
+	} while(y<0);
+}
+
+// Draw cursor
+void _ssd1306_cursor(SSD1306_t * dev, int x0, int y0, int r, bool invert)
+{
+	_ssd1306_line(dev, x0-r, y0, x0+r, y0, invert);
+	_ssd1306_line(dev, x0, y0-r, x0, y0+r, invert);
+}
+
 void ssd1306_invert(uint8_t *buf, size_t blen)
 {
 	uint8_t wk;
@@ -581,7 +609,7 @@ uint8_t ssd1306_rotate_byte(uint8_t ch1) {
 void ssd1306_fadeout(SSD1306_t * dev)
 {
 	void (*func)(SSD1306_t * dev, int page, int seg, uint8_t * images, int width);
-	if (dev->_address == SPIAddress) {
+	if (dev->_address == SPI_ADDRESS) {
 		func = spi_display_image;
 	} else {
 		func = i2c_display_image;
@@ -616,3 +644,4 @@ void ssd1306_dump_page(SSD1306_t * dev, int page, int seg)
 {
 	ESP_LOGI(TAG, "dev->_page[%d]._segs[%d]=%02x", page, seg, dev->_page[page]._segs[seg]);
 }
+

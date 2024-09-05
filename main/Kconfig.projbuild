@@ -2,13 +2,13 @@ menu "Configuração do Wifi Configuration"
 
     config ESP_WIFI_SSID
         string "WiFi SSID"
-        default "COQUINHA GELADA"
+        default "Afonso"
         help
             Nome da rede Wifi.
 
     config ESP_WIFI_PASSWORD
         string "Senha do Wifi"
-        default "jennifergatinha123"
+        default "120405mm"
         help
             Senha do WiFi (WPA or WPA2).
 

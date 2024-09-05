@@ -40,7 +40,7 @@ void app_main(void)
   wifi_semaphore = xSemaphoreCreateBinary();
   mqtt_semaphore = xSemaphoreCreateBinary();
 
-  wifi_start();
+  // wifi_start();
   oled_start();
 
   xTaskCreate(&wifi_task, "conexao_mqtt", 4096, NULL, 1, NULL);
