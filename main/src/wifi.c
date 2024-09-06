@@ -14,9 +14,9 @@
 #include "lwip/sys.h"
 #include "mqtt.h"
 
-#define WIFI_SSID CONFIG_ESP_WIFI_SSID
-#define WIFI_PASS CONFIG_ESP_WIFI_PASSWORD
-#define WIFI_MAXIMUM_RETRY CONFIG_ESP_MAXIMUM_RETRY
+#define WIFI_SSID CONFIG_ESP32_WIFI_SSID
+#define WIFI_PASS CONFIG_ESP32_WIFI_PASSWORD
+#define WIFI_MAXIMUM_RETRY CONFIG_ESP32_MAXIMUM_RETRY
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
@@ -123,7 +123,8 @@ void wifi_task(void *params)
     {
         if (xSemaphoreTake(wifi_semaphore, portMAX_DELAY))
         {
-            mqtt_start();
+            mqtt_thingsboard_start();
+            mqtt_esp_start();
         }
     }
 }

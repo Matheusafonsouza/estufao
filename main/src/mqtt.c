@@ -29,7 +29,8 @@ extern float TEMPERATURE;
 extern float HUMIDITY;
 extern SemaphoreHandle_t mqtt_semaphore;
 
-esp_mqtt_client_handle_t client;
+esp_mqtt_client_handle_t thingsboard_client;
+esp_mqtt_client_handle_t esp_client;
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -37,21 +38,6 @@ static void log_error_if_nonzero(const char *message, int error_code)
     {
         ESP_LOGE(TAG, "Ultimo erro %s: 0x%x", message, error_code);
     }
-}
-
-int get_topico_id(const char *topico)
-{
-    // Encontrar a posição do último "/"
-    const char *ultima_barra = strrchr(topico, '/');
-
-    if (ultima_barra != NULL)
-    {
-        // Converter a parte do número para inteiro
-        return atoi(ultima_barra + 1);
-    }
-
-    // Retorna -1 se não encontrar um número no final do tópico
-    return -1;
 }
 
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
@@ -121,22 +107,39 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     }
 }
 
-void mqtt_start()
+void mqtt_thingsboard_start()
 {
     esp_mqtt_client_config_t mqtt_config = {
         .broker.address.uri = "mqtt://164.41.98.25",
         .credentials.username = "3YWNt2GaZipP2swkMpyY"};
-    client = esp_mqtt_client_init(&mqtt_config);
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
-    esp_mqtt_client_start(client);
+    thingsboard_client = esp_mqtt_client_init(&mqtt_config);
+    esp_mqtt_client_register_event(thingsboard_client, ESP_EVENT_ANY_ID, mqtt_event_handler, thingsboard_client);
+    esp_mqtt_client_start(thingsboard_client);
 }
 
-void mqtt_send(char *topico, char *mensagem)
+void mqtt_esp_start()
 {
-    int message_id = esp_mqtt_client_publish(client, topico, mensagem, 0, 1, 0);
+    esp_mqtt_client_config_t mqtt_config = {
+        .broker.address.uri = "mqtt://192.168.1.17:1883",
+        .credentials.username = "user2",
+        .credentials.authentication.password = "120405",
+    };
+    esp_client = esp_mqtt_client_init(&mqtt_config);
+    esp_mqtt_client_register_event(esp_client, ESP_EVENT_ANY_ID, mqtt_event_handler, esp_client);
+    esp_mqtt_client_start(esp_client);
 }
 
-void mqtt_task(void *params)
+void mqtt_thingsboard_send(char *topico, char *mensagem)
+{
+    int message_id = esp_mqtt_client_publish(thingsboard_client, topico, mensagem, 0, 1, 0);
+}
+
+void mqtt_esp_send(char *topico, char *mensagem)
+{
+    int message_id = esp_mqtt_client_publish(esp_client, topico, mensagem, 0, 1, 0);
+}
+
+void mqtt_thingsboard_task(void *params)
 {
     char mensagem[200];
     char jsonAtributos[200];
@@ -146,8 +149,23 @@ void mqtt_task(void *params)
         while (true)
         {
             sprintf(mensagem, "{\"moisture\": %f, \"temperature\": %f, \"humidity\": %f}", MOISTURE_VALUE, TEMPERATURE, HUMIDITY);
-            mqtt_send("v1/devices/me/telemetry", mensagem);
-            // mqtt_send("v1/devices/me/attributes", mensagem);
+            mqtt_thingsboard_send("v1/devices/me/telemetry", mensagem);
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+        }
+    }
+}
+
+void mqtt_esp_task(void *params)
+{
+    char mensagem[200];
+    char jsonAtributos[200];
+
+    if (xSemaphoreTake(mqtt_semaphore, portMAX_DELAY))
+    {
+        while (true)
+        {
+            sprintf(mensagem, "{\"moisture\": %f, \"temperature\": %f, \"humidity\": %f}", MOISTURE_VALUE, TEMPERATURE, HUMIDITY);
+            mqtt_esp_send("telemetry", mensagem);
             vTaskDelay(3000 / portTICK_PERIOD_MS);
         }
     }
