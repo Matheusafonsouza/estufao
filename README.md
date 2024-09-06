@@ -29,21 +29,6 @@ A partir do uso do Servidor Central Thingsboard foi criado o Dashboard para visu
 
 Todos os estados dos atributos são armazenados na memória NVS, de modo que ao ser reinicializada, a placa volta exatamente para o estado onde estava.
 
-## Pinout
-
-Na imagem a seguir é possível observar como os módulos foram conectados a placa ESP32. 
-
-
-## Em execução 
-
-### Estufão
-
-
-### Dashboard
-
-### Display 
-
-
 ---
 ## Fundamentos de Sistemas Embarcados 2024.1
 
