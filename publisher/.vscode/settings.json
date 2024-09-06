@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "/home/matheus/Documentos/coraline/publisher/main",
+    "idf.port": "/dev/ttyUSB0",
+    "idf.flashType": "UART",
+    "idf.adapterTargetName": "esp32"
+}

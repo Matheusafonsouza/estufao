@@ -15,8 +15,6 @@
 #include "mqtt.h"
 #include "dht11.h"
 #include "nvs.h"
-#include "oled.h"
-#include "button.h"
 
 #define TAG "MAIN"
 
@@ -41,14 +39,10 @@ void app_main(void)
   mqtt_semaphore = xSemaphoreCreateBinary();
 
   wifi_start();
-  oled_start();
 
   xTaskCreate(&wifi_task, "conexao_mqtt", 4096, NULL, 1, NULL);
-  xTaskCreate(&mqtt_thingsboard_task, "thingboard_broker", 4096, NULL, 1, NULL);
   xTaskCreate(&mqtt_esp_task, "eps_broker", 4096, NULL, 1, NULL);
   xTaskCreate(&dht11_task, "dht", 2048, NULL, 3, NULL);
   xTaskCreate(&moisture_task, "sensor_solo", 2048, NULL, 3, NULL);
   xTaskCreate(&save_nvs_task, "armazenamento_nvs", 2048, NULL, 3, NULL);
-  xTaskCreate(&oled_display_info_task, "render_display", 2048, NULL, 2, NULL);
-  xTaskCreate(&button_task, "button", 2048, NULL, 2, NULL);
 }

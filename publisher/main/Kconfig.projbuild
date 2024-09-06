@@ -1,0 +1,20 @@
+menu "Configuração do Wifi Configuration"
+
+    config ESP32_WIFI_SSID
+        string "WiFi SSID"
+        default "Afonso"
+        help
+            Nome da rede Wifi.
+
+    config ESP32_WIFI_PASSWORD
+        string "Senha do Wifi"
+        default "120405mm"
+        help
+            Senha do WiFi (WPA or WPA2).
+
+    config ESP32_MAXIMUM_RETRY
+        int "Número máximo de tentativas de conexão"
+        default 5
+        help
+            Configure o valor máximo de tentativas de conexão.
+endmenu

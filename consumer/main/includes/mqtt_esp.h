@@ -1,5 +1,5 @@
-#ifndef MQTT_H
-#define MQTT_H
+#ifndef MQTT_H_ESP
+#define MQTT_H_ESP
 
 #include <stdio.h>
 #include <stdint.h>
@@ -23,15 +23,9 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
-#include "mqtt.h"
-
 typedef struct esp_mqtt_client *esp_mqtt_client_handle_t;
 
-void mqtt_thingsboard_start();
 void mqtt_esp_start();
-void mqtt_thingsboard_send(char * topico, char * mensagem);
 void mqtt_esp_send(char * topico, char * mensagem);
-void mqtt_thingsboard_task(void *params);
-void mqtt_esp_task(void *params);
 
-#endif // MQTT
+#endif // MQTT_ESP

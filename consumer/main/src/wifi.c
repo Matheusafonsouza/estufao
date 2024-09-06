@@ -12,7 +12,8 @@
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
-#include "mqtt.h"
+#include "mqtt_thingsboard.h"
+#include "mqtt_esp.h"
 
 #define WIFI_SSID CONFIG_ESP32_WIFI_SSID
 #define WIFI_PASS CONFIG_ESP32_WIFI_PASSWORD

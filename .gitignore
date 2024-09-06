@@ -87,3 +87,6 @@ dependencies.lock
 
 # Sublime Project
 .sublime-project
+
+data/
+log/

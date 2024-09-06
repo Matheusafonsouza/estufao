@@ -20,7 +20,7 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 
-#include "mqtt.h"
+#include "mqtt_thingsboard.h"
 
 #define TAG "MQTT"
 
@@ -30,7 +30,6 @@ extern float HUMIDITY;
 extern SemaphoreHandle_t mqtt_semaphore;
 
 esp_mqtt_client_handle_t thingsboard_client;
-esp_mqtt_client_handle_t esp_client;
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {
@@ -117,26 +116,9 @@ void mqtt_thingsboard_start()
     esp_mqtt_client_start(thingsboard_client);
 }
 
-void mqtt_esp_start()
-{
-    esp_mqtt_client_config_t mqtt_config = {
-        .broker.address.uri = "mqtt://192.168.1.17:1883",
-        .credentials.username = "user2",
-        .credentials.authentication.password = "120405",
-    };
-    esp_client = esp_mqtt_client_init(&mqtt_config);
-    esp_mqtt_client_register_event(esp_client, ESP_EVENT_ANY_ID, mqtt_event_handler, esp_client);
-    esp_mqtt_client_start(esp_client);
-}
-
 void mqtt_thingsboard_send(char *topico, char *mensagem)
 {
     int message_id = esp_mqtt_client_publish(thingsboard_client, topico, mensagem, 0, 1, 0);
-}
-
-void mqtt_esp_send(char *topico, char *mensagem)
-{
-    int message_id = esp_mqtt_client_publish(esp_client, topico, mensagem, 0, 1, 0);
 }
 
 void mqtt_thingsboard_task(void *params)
@@ -150,22 +132,6 @@ void mqtt_thingsboard_task(void *params)
         {
             sprintf(mensagem, "{\"moisture\": %f, \"temperature\": %f, \"humidity\": %f}", MOISTURE_VALUE, TEMPERATURE, HUMIDITY);
             mqtt_thingsboard_send("v1/devices/me/telemetry", mensagem);
-            vTaskDelay(3000 / portTICK_PERIOD_MS);
-        }
-    }
-}
-
-void mqtt_esp_task(void *params)
-{
-    char mensagem[200];
-    char jsonAtributos[200];
-
-    if (xSemaphoreTake(mqtt_semaphore, portMAX_DELAY))
-    {
-        while (true)
-        {
-            sprintf(mensagem, "{\"moisture\": %f, \"temperature\": %f, \"humidity\": %f}", MOISTURE_VALUE, TEMPERATURE, HUMIDITY);
-            mqtt_esp_send("telemetry", mensagem);
             vTaskDelay(3000 / portTICK_PERIOD_MS);
         }
     }
